@@ -1,0 +1,63 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+model Extractions {
+  id          String   @id @default(uuid())
+  title       String
+  description String
+  fileName    String
+  software    String
+  sheet       Sheets[]
+}
+
+model Sheets {
+  id           String       @id @default(uuid())
+  Extraction   Extractions? @relation(fields: [extractionId], references: [id])
+  extractionId String?
+  column       Columns[]
+  name         String
+  color        String
+}
+
+model Columns {
+  id       String     @id @default(uuid())
+  bloc     String
+  key      String
+  header   String
+  width    Int
+  transcos Transcos[]
+  Sheet    Sheets?    @relation(fields: [sheetId], references: [id])
+  sheetId  String?
+}
+
+model Transcos {
+  id        String   @id @default(uuid())
+  Columns   Columns? @relation(fields: [columnsId], references: [id])
+  columnsId String?
+  dsnValue  String
+  newValue  String
+}
+
+model DsnBlocs {
+  id        String      @id @default(uuid())
+  name      String
+  dsnFields DsnFields[]
+}
+
+model DsnFields {
+  id        String    @id @default(uuid())
+  field     String
+  name      String
+  structure String
+  DsnBloc   DsnBlocs? @relation(fields: [dsnBlocId], references: [id])
+  dsnBlocId String?
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
