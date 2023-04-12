@@ -7,6 +7,7 @@ model Extractions {
   description String
   fileName    String
   software    String
+  consolidate Boolean
   sheet       Sheets[]
 }
 
@@ -15,19 +16,24 @@ model Sheets {
   Extraction   Extractions? @relation(fields: [extractionId], references: [id])
   extractionId String?
   column       Columns[]
+  type         String
   name         String
   color        String
 }
 
 model Columns {
-  id       String     @id @default(uuid())
-  bloc     String
-  key      String
-  header   String
-  width    Int
-  transcos Transcos[]
-  Sheet    Sheets?    @relation(fields: [sheetId], references: [id])
-  sheetId  String?
+  id           String     @id @default(uuid())
+  bloc         String
+  key          String
+  dsnKey       String
+  header       String
+  width        Int
+  defaultValue String?
+  transcos     Transcos[]
+  Sheet        Sheets?    @relation(fields: [sheetId], references: [id])
+  sheetId      String?
+  left         Int?
+  right        Int?
 }
 
 model Transcos {

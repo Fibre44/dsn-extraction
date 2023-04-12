@@ -4,13 +4,15 @@ CREATE TABLE "Extractions" (
     "title" TEXT NOT NULL,
     "description" TEXT NOT NULL,
     "fileName" TEXT NOT NULL,
-    "software" TEXT NOT NULL
+    "software" TEXT NOT NULL,
+    "consolidate" BOOLEAN NOT NULL
 );
 
 -- CreateTable
 CREATE TABLE "Sheets" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "extractionId" TEXT,
+    "type" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "color" TEXT NOT NULL,
     CONSTRAINT "Sheets_extractionId_fkey" FOREIGN KEY ("extractionId") REFERENCES "Extractions" ("id") ON DELETE SET NULL ON UPDATE CASCADE
@@ -21,9 +23,13 @@ CREATE TABLE "Columns" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "bloc" TEXT NOT NULL,
     "key" TEXT NOT NULL,
+    "dsnKey" TEXT NOT NULL,
     "header" TEXT NOT NULL,
     "width" INTEGER NOT NULL,
+    "defaultValue" TEXT,
     "sheetId" TEXT,
+    "left" INTEGER,
+    "right" INTEGER,
     CONSTRAINT "Columns_sheetId_fkey" FOREIGN KEY ("sheetId") REFERENCES "Sheets" ("id") ON DELETE SET NULL ON UPDATE CASCADE
 );
 
