@@ -1,5 +1,5 @@
 "use client"
-export default function SheetForm({ extractionId }) {
+export default function SheetForm({ extractionId }: { extractionId: string }) {
     const handleSubmit = async (e: React.ChangeEvent<HTMLFormElement>) => {
         e.preventDefault()
         if (e.target) {

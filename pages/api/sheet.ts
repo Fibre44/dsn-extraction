@@ -16,7 +16,8 @@ export default async function handler(
             const name: string = req.body.name
             const extractionId: string = req.body.extractionId
             const color: string = req.body.color
-            if (name && extractionId && color) {
+            const type: string = req.body.type
+            if (name && extractionId && color && type) {
                 const prisma = new PrismaClient
                 const extraction = await prisma.extractions.findUnique({
                     where: {
@@ -30,6 +31,7 @@ export default async function handler(
                     data: {
                         name,
                         color,
+                        type,
                         extractionId
 
                     }

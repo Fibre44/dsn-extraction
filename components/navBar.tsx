@@ -8,7 +8,6 @@ export default function NavBar() {
                 </label>
                 <ul tabIndex={0} className="menu menu-compact dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box w-52">
                     <li><Link href={'/'}>Extraction</Link></li>
-                    <li><Link href={'/extraction'}>Créer/éditer une extraction</Link></li>
                     <li><Link href={'/extraction'}>Github</Link></li>
                 </ul>
             </div>
@@ -17,14 +16,13 @@ export default function NavBar() {
         <div className="navbar-center hidden lg:flex">
             <ul className="menu menu-horizontal px-1">
                 <li><Link href={'/'}>Extraction</Link></li>
-                <li><Link href={'/extraction/form'}>Créer une extraction</Link></li>
-                <li><Link href={'/extraction'}>Editer une extraction</Link></li>
-                <li><Link href={'https://github.com/Fibre44/dsn-extraction'}>Github</Link></li>
+                <li><Link href={'/extraction'}>Consulter une extraction</Link></li>
+                <li></li>
 
             </ul>
         </div>
         <div className="navbar-end">
-            <a className="btn">Get started</a>
+            <a className="btn" href="https://github.com/Fibre44/dsn-extraction">Github</a>
         </div>
     </div>
 }

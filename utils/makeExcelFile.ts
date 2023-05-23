@@ -1,7 +1,7 @@
 import Excel from 'exceljs'
 import { Columns, PrismaClient, Transcos } from '@prisma/client'
-import { DSNDatas } from './makeDSNDatas'
 import path from 'path'
+import { SmartDsn } from '@fibre44/dsn-parser/lib/dsn'
 /**
  * 
  * @param uuid 
@@ -11,7 +11,7 @@ import path from 'path'
  * A partir des données de l'extraction, la fonction va extraire les valeurs de l'objet DSNDatas
  * La fonction va écrire les données dans un fichier Excel
  */
-export const makeExcelFile = async (uuid: string, dsnDatas: DSNDatas[], extractionId: string) => {
+export const makeExcelFile = async (uuid: string, dsnDatas: SmartDsn[], extractionId: string) => {
 
     try {
         const patchProject = path.join(process.cwd() + "/tmp/", uuid)
@@ -62,7 +62,7 @@ export const makeExcelFile = async (uuid: string, dsnDatas: DSNDatas[], extracti
                     //Traitement uniquement des salariés
                     case 'Individu':
                         for (let dsn of dsnDatas) {
-                            let employeeList = dsn.datas.employee
+                            let employeeList = dsn.employees
                             let rowListEmployee = await makeDynamicObject(employeeList, columsPrisma, transcoList)
                             for (let row of rowListEmployee) {
                                 sheet.addRow(row)
@@ -71,26 +71,55 @@ export const makeExcelFile = async (uuid: string, dsnDatas: DSNDatas[], extracti
                         break
                     case 'Contract':
                         for (let dsn of dsnDatas) {
-                            let contractList = dsn.datas.contrats
-                            let rowListContract = await makeDynamicObject(contractList, columsPrisma, transcoList)
-                            for (let row of rowListContract) {
-                                sheet.addRow(row)
+                            let employeeList = dsn.employees
+                            for (let contract of employeeList) {
+                                let contractList = contract.workContracts
+                                let rowListContract = await makeDynamicObject(contractList, columsPrisma, transcoList)
+                                for (let row of rowListContract) {
+                                    sheet.addRow(row)
+                                }
+                            }
+
+                        }
+                        break
+                    case 'AggregateContribution':
+                        for (let dsn of dsnDatas) {
+                            let establishmentList = dsn.society.establishments
+                            for (let establishementAggreagteContribution of establishmentList) {
+                                let aggregateContributionList = establishementAggreagteContribution.aggreagreContribution
+                                let rowListAggregateContributionList = await makeDynamicObject(aggregateContributionList, columsPrisma, transcoList)
+                                for (let row of rowListAggregateContributionList) {
+                                    sheet.addRow(row)
+                                }
                             }
                         }
+                        break
+                    case 'Contact':
+                        for (let dsn of dsnDatas) {
+                            let contactList = dsn.contact
+                            let rowListContact = await makeDynamicObject(contactList, columsPrisma, transcoList)
+                            for (let row of rowListContact) {
+                                sheet.addRow(row)
+                            }
 
+                        }
                         break
                     case 'Mutual':
                         for (let dsn of dsnDatas) {
-                            let mutualList = dsn.datas.mutualEmployeeList
-                            let rowListMutual = await makeDynamicObject(mutualList, columsPrisma, transcoList)
-                            for (let row of rowListMutual) {
-                                sheet.addRow(row)
+                            let employeeList = dsn.employees
+                            for (let mutual of employeeList) {
+                                let mutualList = mutual.mutual
+                                let rowListMutual = await makeDynamicObject(mutualList, columsPrisma, transcoList)
+                                for (let row of rowListMutual) {
+                                    sheet.addRow(row)
+                                }
                             }
+
                         }
                         break
                     case 'Establishment':
                         for (let dsn of dsnDatas) {
-                            let establishmentList = dsn.datas.establishmentList
+                            let establishmentList = dsn.society.establishments
                             let rowListEstablishment = await makeDynamicObject(establishmentList, columsPrisma, transcoList)
                             for (let row of rowListEstablishment) {
                                 sheet.addRow(row)
@@ -106,15 +135,15 @@ export const makeExcelFile = async (uuid: string, dsnDatas: DSNDatas[], extracti
                 await workbook.xlsx.writeFile(`${patchProject}/${fileName}`);
 
             } catch (e) {
-                throw `Erreur écriture du fichier Excel`
+                throw new Error(`Erreur écriture du fichier Excel`)
             }
 
         } else {
-            throw `Nous n'avons pas trouvé le paramétrage de l'extraction dans la base de données`
+            throw new Error(`Nous n'avons pas trouvé le paramétrage de l'extraction dans la base de données`)
         }
         return
-    } catch (e) {
-        throw e
+    } catch (e: any) {
+        throw new Error(e)
     }
 
 }
@@ -153,7 +182,8 @@ const makeDynamicObject = async (dsnDatas: any[], columsPrisma: Columns[], trans
                 }
                 if (transcoFind) {
                     row[column.key] = transcoFind.newValue
-                } if (!left && !right && !transcoFind) {
+                }
+                if (!left && !right && !transcoFind) {
                     row[column.key] = dataRow[column.dsnKey]
                 }
 

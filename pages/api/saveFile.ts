@@ -8,6 +8,7 @@ import { removeFolder } from '../../utils/removeFolder';
 import path from 'path';
 import { extractionParams } from '../../utils/extractionParams';
 import { makeExcelFile } from '../../utils/makeExcelFile';
+import fs from 'node:fs/promises'
 export const config = {
     api: {
         bodyParser: false,
@@ -17,13 +18,15 @@ export const config = {
 type Data = {
     message?: string
     error?: string | any
+
 }
 
 export default async function handler(
     req: NextApiRequest,
-    res: NextApiResponse<Data>
+    res: NextApiResponse<any>
 ) {
     try {
+
         //Etape 1 on verifie que le répértoire tmp existe
         createFolderTmp()
         //Etape 2 on ajoute un répértoire pour les fichiers
@@ -41,7 +44,6 @@ export default async function handler(
             removeFolder(path.join(process.cwd(), `/tmp/${uuid}`))
             return res.status(400).json({ error: `Le body ne doit peut pas contenir plusieurs valeurs` })
         }
-        console.log(`id = ${extractionId}`)
         const extractionParamsPrisma = await extractionParams(extractionId)
 
         if (!extractionParamsPrisma) {
@@ -50,16 +52,18 @@ export default async function handler(
         }
         //Etape 4 on extrait les données de la DSN
         const datasDsn = await makeDSNDatas(uuid, extractionParamsPrisma.consolidate)
-        //Etape 5 on va lance l'extraction
+        //Etape 5 on va lancer l'extraction
         try {
             await makeExcelFile(uuid, datasDsn, extractionId)
 
         } catch (e) {
             return res.status(404).json({ error: e })
         }
-        //removeFolder(path.join(process.cwd(), `/tmp/${uuid}`))
-
-        res.status(200).json({ message: 'Enregistrement des donnnées' })
+        const pathFile = path.join(process.cwd(), `/tmp/${uuid}/${extractionParamsPrisma.fileName}`)
+        const readFile = await fs.readFile(pathFile)
+        removeFolder(path.join(process.cwd(), `/tmp/${uuid}`))
+        return res.send(readFile)
+        //res.status(200).json({ message: 'Enregistrement des donnnées' })
 
 
     } catch (e) {

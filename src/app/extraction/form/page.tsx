@@ -34,7 +34,7 @@ export default function Home() {
     }
     return <form ref={form} className="form-control" onSubmit={handleSubmit}>
         <label className="label" htmlFor="title">
-            Titre de l'extraction
+            Titre de l&apos;extraction
         </label>
         <input type="text" placeholder="Indiquer votre titre" className="input input-bordered input-secondary w-full max-w-xs" id="title" name="title"></input>
         <label className="label" htmlFor="description">

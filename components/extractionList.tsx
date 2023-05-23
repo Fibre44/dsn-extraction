@@ -2,7 +2,7 @@ import { Extractions } from "@prisma/client"
 import Link from "next/link"
 
 type Props = Extractions[]
-export const ExtractionList = ({ extractions }: Props) => {
+export const ExtractionList = ({ extractions }: { extractions: Extractions[] }) => {
     return <div className="w-full max-w-xs my-2">
 
         {extractions.map(extractionParams => <ExtractionRow key={extractionParams.id} extraction={extractionParams} />)}
@@ -10,9 +10,9 @@ export const ExtractionList = ({ extractions }: Props) => {
 
 }
 
-const ExtractionRow = ({ extraction }: Extractions) => {
+const ExtractionRow = ({ extraction }: { extraction: Extractions }) => {
 
-    return < div className="card w-96 bg-primary text-primary-content" >
+    return <div className="card w-96 bg-primary text-primary-content mb-9" >
         <div className="card-body">
             <h2 className="card-title">{extraction.title}</h2>
             <p>{extraction.description}</p>
@@ -21,6 +21,8 @@ const ExtractionRow = ({ extraction }: Extractions) => {
 
             </div>
         </div>
-    </div >
+    </div>
+
+
 }
 

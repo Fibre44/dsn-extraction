@@ -18,7 +18,8 @@ export default async function handler(
             const header = req.body.header
             const width = parseInt(req.body.width)
             const sheetId = req.body.sheetId
-            if (bloc && key && header && width && sheetId) {
+            const dsnKey = req.body.dsnKey
+            if (bloc && key && header && width && sheetId && dsnKey) {
                 const prisma = new PrismaClient
                 const sheet = await prisma.sheets.findUnique({
                     where: {
@@ -32,6 +33,7 @@ export default async function handler(
                     data: {
                         bloc,
                         key,
+                        dsnKey,
                         header,
                         width,
                         sheetId
