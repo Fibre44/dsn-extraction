@@ -12,7 +12,7 @@ export default async function handler(
 ) {
     try {
 
-        if (req.method = 'POST') {
+        if (req.method == 'POST') {
             const bloc = req.body.bloc
             const key = req.body.key
             const header = req.body.header
@@ -43,7 +43,6 @@ export default async function handler(
                 await prisma.$disconnect()
                 res.status(200).json({ name: newSheet })
 
-                await prisma.$disconnect()
             } else (
                 res.status(400).json({ error: 'Requete incomplète' })
             )

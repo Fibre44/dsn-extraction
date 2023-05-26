@@ -27,6 +27,7 @@ export const makeExcelFile = async (uuid: string, dsnDatas: SmartDsn[], extracti
         })
         //Gestion à revoir car là on charge toutes les transcos
         const transcoList = await prisma.transcos.findMany()
+        await prisma.$disconnect()
         if (extraction) {
             const fileName = extraction.fileName
             //Etape 2 on instancie l'objet Excel
@@ -130,7 +131,6 @@ export const makeExcelFile = async (uuid: string, dsnDatas: SmartDsn[], extracti
                 }
 
             }
-            await prisma.$disconnect()
             try {
                 await workbook.xlsx.writeFile(`${patchProject}/${fileName}`);
 

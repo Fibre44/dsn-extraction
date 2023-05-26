@@ -39,38 +39,45 @@ export default async function extraction({ params }: { params: Params }) {
         })
         await prisma.$disconnect()
     }
-
-    return <div className="w-full flex flex-col h-5">
+    const columnnParam = columns?.find(column => column.id === columnId)
+    return <div className="w-full">
         <div>
-            <div className="tabs w-full ">
-                {sheets ? sheets.map(sheet => <Link key={sheet.id} className="tab tab-sm tab-lifted" href={`/extraction/${extractionId}/${sheet.id}`}>{sheet.name}</Link>) : ''}
+            <ul className="menu menu-horizontal bg-base-100 rounded-box">
+                {sheets ? sheets.map(sheet => <li key={sheet.id} ><Link className={sheet.id === sheetId ? "tab tab-lg tab-lifted tab-active" : "tab tab-lg tab-lifted"} href={`/extraction/${extractionId}/${sheet.id}`}>{sheet.name}</Link></li>) : ''}
+            </ul>
+        </div>
+        <div className="grid grid-cols-2">
+            <div >
+                <ul className="menu bg-base-100 w-56">
+                    {columns ? columns.map(column =>
+                        <li key={column.id}><Link key={column.id} className={column.id === columnId ? "active" : ""} href={`/extraction/${extractionId}/${sheetId}/${column.id}`}>{column.header}</Link></li>
+                    ) : ''}
+                </ul>
+
+            </div>
+            <div>
+                {columnnParam ?
+                    <ul>
+                        <li key={columnnParam.id}>Segment DSN :{dsnSegment.find(dsn => dsn.field === columnnParam.dsnKey)?.structure ? dsnSegment.find(dsn => dsn.field === columnnParam.dsnKey)?.structure : 'Colonne vide'}</li>
+                        <li key={columnnParam.defaultValue}>Valeur par default : {columnnParam.defaultValue}</li>
+                        <li key={columnnParam.width}>Largeur de la colonne : {columnnParam.width}</li>
+                        <li key={columnnParam.left}>Gauche : {columnnParam.left}</li>
+                        <li key={columnnParam.right}>Droite : {columnnParam.right}</li>
+                        {transcos ? transcos.map(transco =>
+                            <>
+                                <li key={transco.id}>Valeur DSN : {transco.dsnValue}</li>
+                                <li key={transco.id}>Valeur transco : {transco.newValue}</li>
+                            </>
+                        )
+                            : ""}
+                    </ul>
+                    :
+                    <p></p>}
             </div>
         </div>
-        {columns ? <table className="table w-full">
-            {/* head */}
-            <thead>
-                <tr>
-                    <th>Nom de la colonne</th>
-                    <th>Segment DSN</th>
-                    <th>Valeur par default</th>
-                    <th>Largeur</th>
-                    <th>Extraction à droite</th>
-                    <th>Extraction à gauche</th>
-                </tr>
-            </thead>
-            <tbody>
-                {columns ? columns.map(column =>
-                    <tr key={column.id}>
-                        <th>{column.header}</th>
-                        <th>{dsnSegment.find(dsn => dsn.field === column.dsnKey)?.structure ? dsnSegment.find(dsn => dsn.field === column.dsnKey)?.structure : 'Colonne vide'}</th>
-                        <th>{column.defaultValue}</th>
-                        <th>{column.width}</th>
-                        <th>{column.left}</th>
-                        <th>{column.right}</th>
 
-                    </tr>) : ''}
-            </tbody>
-        </table> : ''}
+
+
 
 
     </div>

@@ -14,11 +14,12 @@ export default async function handler(
     try {
         const method = req.method
         const prisma = new PrismaClient
-
         switch (method) {
             case 'POST':
                 const body = req.body
-                body?.consolidate ? body.consolidate = true : body.consolidate = false
+                if (!body.consolidate) {
+                    body.consolidate = false
+                }
                 const newExtraction = await prisma.extractions.create({
                     data: body
                 })
@@ -31,12 +32,12 @@ export default async function handler(
                 res.status(200).json({ extractionList: extractionsList })
                 break
             default:
+                await prisma.$disconnect()
                 res.status(400).json({ error: 'Mauvaise méthode' })
         }
 
 
     } catch (e: any) {
-
         res.status(500).json({ error: e })
     }
 }
