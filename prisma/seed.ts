@@ -942,6 +942,66 @@ async function main() {
         }
     })
 
+    //Création de l'extraction numéro de contrat
+
+    await prisma.extractions.create({
+        data: {
+            title: 'Controle des contrats',
+            description: 'Extraction des contrats DSN',
+            fileName: 'contrats.xlsx',
+            software: '',
+            consolidate: true,
+            sheet: {
+                create: [{
+                    name: 'Contrats',
+                    color: 'FFC0000',
+                    type: 'Individu/Contract',
+                    column: {
+                        create: [
+                            {
+                                bloc: 'Society',
+                                key: 'siren',
+                                dsnKey: 'siren',
+                                header: `siren`,
+                                width: 10,
+                            },
+                            {
+                                bloc: 'Individu',
+                                key: 'matri',
+                                dsnKey: 'employeeId',
+                                header: `matri`,
+                                width: 10,
+                            },
+                            {
+                                bloc: 'Individu',
+                                key: 'numSS',
+                                dsnKey: 'numSS',
+                                header: 'Numéro SS',
+                                width: 10
+                            },
+                            {
+                                bloc: 'Contract',
+                                key: 'startDate',
+                                dsnKey: 'startDate',
+                                header: `Date début contrat`,
+                                width: 10,
+                            },
+                            {
+                                bloc: 'Contract',
+                                key: 'contractId',
+                                dsnKey: 'contractId',
+                                header: `Numéro de contrat`,
+                                width: 10,
+                            },
+
+                        ]
+                    }
+
+                }]
+            }
+        }
+    })
+
     //Création de l'extraction HRU
 
     await prisma.extractions.create({

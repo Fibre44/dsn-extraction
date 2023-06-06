@@ -10,8 +10,6 @@ export const formData = async (
     if (saveLocally) {
         options.uploadDir = path.join(process.cwd(), `/tmp/${uuid}`);
         options.filename = (name, ext, path, form) => {
-            console.log(options.filename)
-
             return Date.now().toString() + "_" + path.originalFilename;
         };
     }

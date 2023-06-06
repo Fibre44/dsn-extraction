@@ -1,5 +1,6 @@
 import Excel from 'exceljs'
-import { Columns, PrismaClient, Transcos } from '@prisma/client'
+import { Columns, Transcos } from '@prisma/client'
+import { prisma } from './db'
 import path from 'path'
 import { SmartDsn } from '@fibre44/dsn-parser/lib/dsn'
 /**
@@ -16,7 +17,6 @@ export const makeExcelFile = async (uuid: string, dsnDatas: SmartDsn[], extracti
     try {
         const patchProject = path.join(process.cwd() + "/tmp/", uuid)
         //Etape 1 on récupére le paramétrage de l'extraction à réaliser
-        const prisma = new PrismaClient()
         const extraction = await prisma.extractions.findFirst({
             where: {
                 id: extractionId
@@ -128,6 +128,29 @@ export const makeExcelFile = async (uuid: string, dsnDatas: SmartDsn[], extracti
                         }
 
                         break
+                    case 'Individu/Contract':
+                        const employeesWorkContractList: {}[] = []
+                        for (let dsn of dsnDatas) {
+                            let siren = dsn.society.siren
+                            let employeeList = dsn.employees
+                            for (let employee of employeeList) {
+                                for (let contract of employee.workContracts) {
+                                    let employeeWorkContract = {
+                                        siren,
+                                        ...employee,
+                                        ...contract
+                                    }
+                                    employeesWorkContractList.push(employeeWorkContract)
+                                }
+                            }
+                            let rowListEmployeeWorkContrat = await makeDynamicObject(employeesWorkContractList, columsPrisma, transcoList)
+                            for (let row of rowListEmployeeWorkContrat) {
+                                sheet.addRow(row)
+                            }
+                        }
+
+                        break
+
                 }
 
             }
@@ -155,7 +178,7 @@ export const makeExcelFile = async (uuid: string, dsnDatas: SmartDsn[], extracti
  * @returns 
  *
  */
-const makeDynamicObject = async (dsnDatas: any[], columsPrisma: Columns[], transcoList: Transcos[]) => {
+const makeDynamicObject = async (dsnDatas: {}[], columsPrisma: Columns[], transcoList: Transcos[]) => {
     let rowList = []
     let datasList = dsnDatas
     let row: any = {}

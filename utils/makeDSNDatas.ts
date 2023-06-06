@@ -2,6 +2,8 @@ import { DsnParser } from "@fibre44/dsn-parser"
 import path from 'path';
 import { readdir } from 'fs/promises';
 import { ContactObject, DsnObject, SmartDsn } from "@fibre44/dsn-parser/lib/dsn";
+import { createFolderUtf } from "./createFolder";
+import fs from 'node:fs/promises'
 /**
  * Retroune un object avec les données consolidées des différentes DSN
  * @param uuid 
@@ -91,13 +93,27 @@ export const makeDSNDatas = async (uuid: string, consolidate: boolean) => {
     }
 
 }
+/**
+ * La fonction va lire les données des DSN pour retourner les donnnées sous la forme d'un objet
+ * @param uuid 
+ * @returns 
+ */
 
 const readDsn = async (uuid: string) => {
-    const patchProject = path.join(process.cwd() + "/tmp/", uuid)
+    try {
+        await convertUtf8(uuid)
+
+    } catch {
+        console.error('Erreur conversion en utf-8')
+        throw new Error('Erreur conversion en utf-8')
+    }
+    const patchProject = path.join(process.cwd(), 'tmp', uuid, 'utf8')
+    console.log(patchProject)
     const files = await readdir(patchProject);
+    console.log(files)
     const dsnList = []
     //Cette boucle enregistre les données des fichiers dsn dans un object Javascript
-    for (const file of files) {
+    for (let file of files) {
         let filePatch = path.join(patchProject, file)
         let dsnParser = new DsnParser()
         //On parse le fichier et on supprime le fichier après lecture
@@ -109,4 +125,32 @@ const readDsn = async (uuid: string) => {
     }
 
     return dsnList
+}
+
+/**
+ * La fonction va convertir les fichiers DSN en ascii au format utf8
+ * @param uuid 
+ */
+
+const convertUtf8 = async (uuid: string) => {
+    const patchProject = path.join(process.cwd() + "/tmp/", uuid)
+    const files = await readdir(patchProject);
+    //on ajoute le dossier utf8
+    createFolderUtf(uuid)
+    for (let file of files) {
+        let filePatchAscii = path.join(patchProject, file)
+        try {
+            let readFileAnsi = await fs.readFile(filePatchAscii, 'ascii')
+
+            let filePatchUtf8 = path.join(process.cwd(), 'tmp', uuid, 'utf8', file)
+            await fs.writeFile(filePatchUtf8, readFileAnsi, { encoding: 'utf-8' })
+
+        } catch (e) {
+            console.error(`Erreur lecture/écriture ${file}`)
+        }
+    }
+    return
+
+
+
 }

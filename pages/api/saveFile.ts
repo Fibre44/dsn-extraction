@@ -50,6 +50,7 @@ export default async function handler(
             removeFolder(path.join(process.cwd(), `/tmp/${uuid}`))
             return res.status(404).json({ error: `L'id de l'extraction n'existe pas` })
         }
+
         //Etape 4 on extrait les données de la DSN
         const datasDsn = await makeDSNDatas(uuid, extractionParamsPrisma.consolidate)
         //Etape 5 on va lancer l'extraction

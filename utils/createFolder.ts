@@ -14,3 +14,10 @@ export const createFolderProjet = (uuid: string): void => {
     fs.mkdirSync(pathString);
     return
 }
+
+export const createFolderUtf = (uuid: string): void => {
+    const patch = path.join(process.cwd() + "/tmp/", uuid, 'utf8')
+    const pathString = patch.toString()
+    fs.mkdirSync(pathString);
+    return
+}
